@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faith Fuel Suplementos</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#070707;color:#fafafa}
+header{text-align:center;padding:20px}
+h1{color:#d9b98d}
+.container{padding:20px;max-width:900px;margin:auto}
+.product{border:1px solid #333;padding:15px;margin:10px 0}
+button{background:#d9b98d;border:none;padding:10px 15px;font-weight:bold;cursor:pointer}
+input,select{width:100%;padding:8px;margin:5px 0}
+.cart{background:#111;padding:20px;margin-top:30px}
+.footer{text-align:center;padding:20px;margin-top:40px;background:#111}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Faith Fuel Suplementos</h1>
+<p>Fortaleça o corpo. Honre o propósito.</p>
+</header>
+
+<div class="container">
+<h2>Produtos</h2>
+<div id="products"></div>
+
+<div class="cart">
+<h3>Carrinho</h3>
+<div id="cartItems"></div>
+<p>Subtotal: R$ <span id="subtotal">0.00</span></p>
+<p>Desconto: R$ <span id="discount">0.00</span></p>
+<p>Total: R$ <span id="total">0.00</span></p>
+
+<h3>Finalizar Pedido</h3>
+<input id="name" placeholder="Nome Completo" required>
+<input id="phone" placeholder="Telefone" required>
+<input id="address" placeholder="Endereço" required>
+<input id="cep" placeholder="CEP" required>
+<select id="payment">
+<option value="PIX">PIX</option>
+<option value="Dinheiro na entrega">Dinheiro na entrega</option>
+</select>
+<button onclick="checkout()">Finalizar Pedido</button>
+</div>
+</div>
+
+<div class="footer">
+<p>Entregamos apenas Natal e Extremoz RN</p>
+</div>
+
+<script>
+const products=[
+{name:"Top Whey 3W Baunilha 900g",price:207.99},
+{name:"Tasty Whey Cookies & Cream 900g",price:202.99},
+{name:"Gold Whey Baunilha 900g",price:174.99},
+{name:"Gold Whey Chocolate 900g",price:174.99},
+{name:"Isofort WPI 900g",price:299.99},
+{name:"Creapure Probiotica 150g",price:119.99},
+{name:"Creatina Monohidratada Probiotica 300g",price:78.99},
+{name:"Creatina Integral Medica 150g",price:39.99},
+{name:"Creatina Integral Medica 300g",price:69.99},
+{name:"Creatina Max Titanium 150g",price:49.99},
+{name:"Creatina Max Titanium 300g",price:79.99},
+{name:"Dila Pump Maçã Verde 318g",price:107.99},
+{name:"Dilla Pump Tangerina 318g",price:107.99},
+{name:"Dila Pump Limonada 150g",price:74.99},
+{name:"Super Gainers Anticatabolic 3kg Max Titanium",price:122.99}
+];
+
+let cart=[];
+let discount=0;
+
+// verifica cupom secreto via URL
+const params=new URLSearchParams(window.location.search);
+if(params.get("cupom")==="DRAFLORENÇA10"){
+discountActive=true;
+}
+
+function renderProducts(){
+const container=document.getElementById("products");
+products.forEach((p,i)=>{
+container.innerHTML+=`
+<div class="product">
+<h4>${p.name}</h4>
+<p>R$ ${p.price.toFixed(2)}</p>
+<button onclick="addToCart(${i})">Adicionar</button>
+</div>`;
+});
+}
+
+function addToCart(i){
+cart.push(products[i]);
+renderCart();
+}
+
+function renderCart(){
+let subtotal=0;
+cart.forEach(item=>subtotal+=item.price);
+
+if(params.get("cupom")==="DRAFLORENÇA10"){
+discount=subtotal*0.10;
+}else{
+discount=0;
+}
+
+let total=subtotal-discount;
+
+document.getElementById("cartItems").innerHTML=
+cart.map(p=>`<p>${p.name} - R$ ${p.price.toFixed(2)}</p>`).join("");
+
+document.getElementById("subtotal").innerText=subtotal.toFixed(2);
+document.getElementById("discount").innerText=discount.toFixed(2);
+document.getElementById("total").innerText=total.toFixed(2);
+}
+
+function validCEP(cep){
+cep=cep.replace(/\D/g,'');
+let n=parseInt(cep);
+if(n>=59000001 && n<=59139999) return true;
+if(n>=59575000 && n<=59577999) return true;
+return false;
+}
+
+function checkout(){
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
+const address=document.getElementById("address").value;
+const cep=document.getElementById("cep").value;
+const payment=document.getElementById("payment").value;
+
+if(!validCEP(cep)){
+alert("Entregamos apenas Natal e Extremoz RN.");
+return;
+}
+
+let total=document.getElementById("total").innerText;
+let items=cart.map(p=>p.name).join(", ");
+
+let message=`Pedido - Faith Fuel Suplementos
+Nome: ${name}
+Telefone: ${phone}
+Endereço: ${address}
+CEP: ${cep}
+Pagamento: ${payment}
+Produtos: ${items}
+Total: R$ ${total}`;
+
+window.open(`https://wa.me/55SEUNUMEROAQUI?text=${encodeURIComponent(message)}`);
+window.location.href=`mailto:SEUEMAILAQUI?subject=Novo Pedido&body=${encodeURIComponent(message)}`;
+}
+
+renderProducts();
+</script>
+
+</body>
+</html>
